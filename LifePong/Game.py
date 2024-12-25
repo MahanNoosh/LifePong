@@ -272,7 +272,7 @@ def main():
         if not game_started:
             start_text = font.render("Press SPACE to Start", True, WHITE)
             screen.blit(start_text, (SCREEN_WIDTH // 2 - start_text.get_width() // 2, SCREEN_HEIGHT // 2
-                                     - start_text.get_height()))
+                                     - start_text.get_height() + 5))
             # Draw vertical lines as boundaries
             pygame.draw.line(screen, GREEN, (PLACING_WIDTH * CELL_SIZE, 0), (PLACING_WIDTH
                                                                              * CELL_SIZE, SCREEN_HEIGHT), 2)
