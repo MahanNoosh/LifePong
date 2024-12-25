@@ -20,12 +20,12 @@ FPS = 30
 PLACING_WIDTH = 40  # Columns designated for player placement
 
 # Colors
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
+RED = (191, 38, 0)
+BLUE = (76, 154, 255)
+GREEN = (121, 242, 192)
 BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GRAY = (100, 100, 100)
+WHITE = (244, 245, 247)
+GRAY = (80, 95, 121)
 
 # Ball Settings
 BALL_SIZE = 15
