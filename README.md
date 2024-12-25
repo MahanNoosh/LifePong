@@ -1,6 +1,6 @@
 # LifePong
 A creative game by combination of two games named Pong and Conway's Game Of Life. 
-Rules:
+#Rules:
 at the beginning of the game each player has 40 cells to place (make alive) on their side of board. These and the future generations of them will work as puddles of original pong game.
 At each step in time, the following transitions occur:
 
