@@ -1,7 +1,7 @@
 # LifePong
 A creative game by combination of two games named Pong and Conway's Game Of Life. 
 # Rules:
-at the beginning of each round players have 40 cells to place/remove (make alive/kill) on their side of board using mouse (you can also drag for quick input). These and their future generations will work as puddles of original pong game.
+at the beginning of each round players have 40 cells to place/remove (make alive/kill) on their side of board using mouse (you can also drag for quick input). These and their future generations will work as paddles of original pong game.
 At each step in time, the following transitions occur:
 
 - Any live cell with fewer than two live neighbours dies, as if by underpopulation.
