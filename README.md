@@ -1,5 +1,5 @@
-# LifePong (Game of Pong/ Pong of Life/ Life as a Pong? Help me with the name)
-A creative game by combination of two games named Pong and Conway's Game Of Life. 
+# LifePong
+A creative game by combination of two games named Pong and Conway's Game Of Life. Game of Pong/ Pong of Life/ Life as a Pong? Pong in real life? Help me with the name HAHAHA
 # Rules:
 at the beginning of each round players have 40 cells to place/remove (make alive/kill) on their side of board using mouse (you can also drag for quick input). These and their future generations will work as paddles of original pong game.
 At each step in time, the following transitions occur:
