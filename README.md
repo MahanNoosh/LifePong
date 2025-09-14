@@ -57,7 +57,7 @@ pip install pygame
 ```
 3. Run the game:
 ```bash
-python life_pong.py
+python game.py
 ```
 
 --- 
