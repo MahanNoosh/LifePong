@@ -49,7 +49,6 @@ These rules create a dynamic environment where the paddles' behavior is influenc
 
 ```bash
 git clone https://github.com/MahanNoosh/LifePong.git
-cd LifePong
 ```
 2. Install dependencies:
 ```bash
