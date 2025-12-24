@@ -56,7 +56,7 @@ pip install pygame
 ```
 3. Run the game:
 ```bash
-python game.py
+python main.py
 ```
 
 --- 
