@@ -23,6 +23,7 @@ class Ball:
         self.vy = 0.0
         self.speed = config.BALL_BASE_SPEED
         self.collision_cooldown = 0
+        self.hit_cells = set()  # Track cells that can't be hit again until ball leaves them
         
     def reset(self, x: float, y: float) -> None:
         """Reset ball to starting position with random direction."""
@@ -36,6 +37,7 @@ class Ball:
         self.vx = direction * self.speed * math.cos(angle)
         self.vy = self.speed * math.sin(angle) * random.choice([-1, 1])
         self.collision_cooldown = 0
+        self.hit_cells = set()
         
     def get_collision_points(self) -> List[Tuple[float, float]]:
         """Get 8 points around the ball perimeter for collision detection."""

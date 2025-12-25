@@ -285,7 +285,7 @@ class Renderer:
         placing_width = self.config.PLACING_WIDTH
         
         # P1 label
-        p1_text = self.zone_font.render("← P1 ZONE", True, self.colors.NEON_CYAN)
+        p1_text = self.zone_font.render("P1 ZONE", True, self.colors.NEON_CYAN)
         p1_bg = pygame.Surface((p1_text.get_width() + 20, p1_text.get_height() + 10), pygame.SRCALPHA)
         pygame.draw.rect(p1_bg, (0, 40, 50, 180), p1_bg.get_rect(), border_radius=5)
         pygame.draw.rect(p1_bg, self.colors.NEON_CYAN, p1_bg.get_rect(), 1, border_radius=5)
@@ -293,7 +293,7 @@ class Renderer:
         self.screen.blit(p1_bg, (placing_width * cell_size // 2 - p1_bg.get_width() // 2, 70))
         
         # P2 label
-        p2_text = self.zone_font.render("P2 ZONE →", True, self.colors.NEON_PINK)
+        p2_text = self.zone_font.render("P2 ZONE", True, self.colors.NEON_PINK)
         p2_bg = pygame.Surface((p2_text.get_width() + 20, p2_text.get_height() + 10), pygame.SRCALPHA)
         pygame.draw.rect(p2_bg, (50, 0, 40, 180), p2_bg.get_rect(), border_radius=5)
         pygame.draw.rect(p2_bg, self.colors.NEON_PINK, p2_bg.get_rect(), 1, border_radius=5)
@@ -336,7 +336,7 @@ class Renderer:
     def draw_scores(self, players: List[Player], time: int) -> None:
         """Draw score display (semi-transparent)."""
         # Semi-transparent background
-        score_width, score_height = 240, 50
+        score_width, score_height = 240, 80
         score_surf = pygame.Surface((score_width, score_height), pygame.SRCALPHA)
         pygame.draw.rect(score_surf, (20, 20, 40, 140), score_surf.get_rect(), border_radius=10)
         pygame.draw.rect(score_surf, (*self.colors.NEON_PURPLE, 180), score_surf.get_rect(), 2, border_radius=10)

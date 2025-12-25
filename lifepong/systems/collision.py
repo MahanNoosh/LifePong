@@ -19,10 +19,16 @@ class CollisionSystem:
         damage = self.config.BALL_DAMAGE_BASE
         if self.config.BALL_DAMAGE_SPEED_BONUS:
             speed_ratio = ball.speed / self.config.BALL_MAX_SPEED
-            if speed_ratio > 0.7:
-                damage += 1
-            if speed_ratio > 0.9:
-                damage += 1
+            
+            # Use configurable thresholds or default values
+            thresholds = self.config.BALL_DAMAGE_THRESHOLDS
+            if thresholds is None:
+                thresholds = [(0.7, 1), (0.9, 1)]  # Default thresholds
+            
+            # Apply damage bonuses for each threshold reached
+            for threshold, bonus in thresholds:
+                if speed_ratio > threshold:
+                    damage += bonus
         return damage
         
     def check_wall_collision(self, ball: Ball) -> Optional[str]:
@@ -67,9 +73,27 @@ class CollisionSystem:
             
         cell_size = self.config.CELL_SIZE
         
+        # Get all cells the ball is currently overlapping
+        cells_overlapping = set()
         for px, py in ball.get_collision_points():
             grid_x = int(px // cell_size)
             grid_y = int(py // cell_size)
+            cells_overlapping.add((grid_x, grid_y))
+        
+        # Also add the cell the ball center is in
+        center_cell = (int(ball.x // cell_size), int(ball.y // cell_size))
+        cells_overlapping.add(center_cell)
+        
+        # Remove cells from hit_cells that the ball has left
+        ball.hit_cells = ball.hit_cells & cells_overlapping
+        
+        for px, py in ball.get_collision_points():
+            grid_x = int(px // cell_size)
+            grid_y = int(py // cell_size)
+            
+            # Skip if this cell was already hit and ball is still overlapping
+            if (grid_x, grid_y) in ball.hit_cells:
+                continue
             
             if grid.is_alive(grid_x, grid_y):
                 # Calculate collision normal
@@ -131,14 +155,19 @@ class CollisionSystem:
         ball.vy += random.uniform(-0.2, 0.2)
         ball.normalize_velocity()
         
-        # Set cooldown
+        # Set cooldown and track hit cell
         ball.set_collision_cooldown()
+        ball.hit_cells.add((cx, cy))
         
         return destroyed, cx, cy
     
     def _ensure_minimum_angle(self, ball: Ball) -> None:
         """Ensure ball has minimum angle to prevent 90-degree traps."""
+        if not self.config.ENFORCE_MIN_BOUNCE_ANGLE or self.config.MIN_BOUNCE_ANGLE <= 0:
+            return
+            
         min_angle = self.config.MIN_BOUNCE_ANGLE
+        adjustment_strength = self.config.BOUNCE_ANGLE_ADJUSTMENT
         
         # Calculate current angle
         current_angle = math.atan2(abs(ball.vy), abs(ball.vx))
@@ -147,10 +176,10 @@ class CollisionSystem:
         if current_angle > (math.pi / 2 - min_angle):
             # Add horizontal velocity
             adjustment = min_angle * random.choice([-1, 1])
-            ball.vx += math.cos(adjustment) * ball.speed * 0.3
+            ball.vx += math.cos(adjustment) * ball.speed * adjustment_strength
             
         # If angle is too shallow (close to 0 degrees horizontal)
         elif current_angle < min_angle:
             # Add vertical velocity
             adjustment = min_angle * random.choice([-1, 1])
-            ball.vy += math.sin(min_angle) * ball.speed * 0.3 * random.choice([-1, 1])
+            ball.vy += math.sin(min_angle) * ball.speed * adjustment_strength * random.choice([-1, 1])

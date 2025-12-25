@@ -105,7 +105,6 @@ class GameOfLifeGrid:
                 elif current == 0 and neighbors == 3:
                     # Born - full health
                     new_cells[y][x] = self.max_health
-                    new_cells[y][x] = 1
                     
         self.cells = new_cells
         

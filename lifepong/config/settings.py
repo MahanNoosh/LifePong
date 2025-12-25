@@ -21,7 +21,7 @@ class GameConfig:
     BALL_RADIUS: int = 9
     BALL_BASE_SPEED: float = 6.0
     BALL_MAX_SPEED: float = 12.0
-    BALL_ACCELERATION: float = 0.15
+    BALL_ACCELERATION: float = 0.3
     BALL_ACCEL_INTERVAL: int = 120  # Frames between acceleration
     COLLISION_COOLDOWN: int = 5
     
@@ -35,7 +35,14 @@ class GameConfig:
     CELL_MAX_HEALTH: int = 3  # Hits required to destroy a cell
     BALL_DAMAGE_BASE: int = 1  # Base damage per hit
     BALL_DAMAGE_SPEED_BONUS: bool = True  # Extra damage at high speed
-    MIN_BOUNCE_ANGLE: float = 0.0  # Minimum angle (radians) to prevent 90-degree traps
+    # Speed thresholds (as ratio of max speed) and their damage bonuses
+    # Format: [(threshold_ratio, damage_bonus), ...]
+    BALL_DAMAGE_THRESHOLDS: list = None  # Uses default [(0.7, 1), (0.9, 1)] if None
+    
+    # Bounce Angle Control
+    ENFORCE_MIN_BOUNCE_ANGLE: bool = False  # Enable minimum angle enforcement to prevent 90-degree traps
+    MIN_BOUNCE_ANGLE: float = 0.2  # Minimum angle in radians (0.2 ≈ 11.5°, 0.0 = disabled)
+    BOUNCE_ANGLE_ADJUSTMENT: float = 0.3  # How strongly to adjust velocity (0.1-0.5 recommended)
     
     # Visual Effects
     TRAIL_LENGTH: int = 15

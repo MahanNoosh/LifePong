@@ -199,17 +199,17 @@ class LifePong:
         wall = self.collision.check_wall_collision(self.ball)
         if wall in ['top', 'bottom']:
             self.collision.handle_wall_collision(self.ball, wall)
-            self.screen_shake.add_shake(5)
+            self.screen_shake.add_shake(25)
             self.particles.spawn(int(self.ball.x), int(self.ball.y), self.colors.NEON_YELLOW, 15)
         elif wall == 'left':
             self.players[1].score += 1
-            self.screen_shake.add_shake(25)
+            self.screen_shake.add_shake(75)
             self.particles.spawn(int(self.ball.x), int(self.ball.y), self.colors.NEON_PINK, 60)
             self._reset_round()
             return
         elif wall == 'right':
             self.players[0].score += 1
-            self.screen_shake.add_shake(25)
+            self.screen_shake.add_shake(75)
             self.particles.spawn(int(self.ball.x), int(self.ball.y), self.colors.NEON_CYAN, 60)
             self._reset_round()
             return
