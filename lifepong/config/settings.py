@@ -31,6 +31,13 @@ class GameConfig:
     MAX_CELLS: int = 300  # Maximum cells a player can hold at any time
     LIFE_UPDATE_INTERVAL: int = 3  # Frames between Game of Life updates
     
+    # Multiplayer Placement System
+    PLACEMENT_TIME_SECONDS: float = 25.0  # Total placement window duration
+    # Rate limiting cooldowns (in milliseconds)
+    RAPID_BUILD_COOLDOWN_MS: int = 50  # First 15 seconds: max 1 edit every 100ms (~10 edits/sec)
+    PRECISION_COOLDOWN_MS: int = 250  # Last 10 seconds: max 1 edit every 300ms (~3 edits/sec)
+    RAPID_BUILD_DURATION: float = 15.0  # Duration of rapid build phase in seconds
+    
     # Cell Health System
     CELL_MAX_HEALTH: int = 3  # Hits required to destroy a cell
     BALL_DAMAGE_BASE: int = 1  # Base damage per hit

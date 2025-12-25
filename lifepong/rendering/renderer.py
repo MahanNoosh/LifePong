@@ -39,11 +39,15 @@ class Renderer:
             self.font = pygame.font.SysFont("Arial", 28)
             self.score_font = pygame.font.SysFont("Arial Black", 48)
             self.zone_font = pygame.font.SysFont("Arial", 20, bold=True)
+            self.timer_font = pygame.font.SysFont("Arial Black", 56)
+            self.small_font = pygame.font.SysFont("Arial", 18)
         except:
             self.title_font = pygame.font.SysFont(None, 72)
             self.font = pygame.font.SysFont(None, 28)
             self.score_font = pygame.font.SysFont(None, 48)
             self.zone_font = pygame.font.SysFont(None, 20)
+            self.timer_font = pygame.font.SysFont(None, 56)
+            self.small_font = pygame.font.SysFont(None, 18)
             
     def _create_background(self) -> pygame.Surface:
         """Create gradient background with grid lines."""
@@ -213,15 +217,23 @@ class Renderer:
                 hover_rect = pygame.Rect(hx * cell_size, hy * cell_size, cell_size, cell_size)
                 hover_pulse = abs(math.sin(time * 0.15)) * 0.5 + 0.5
                 
-                if not grid.is_alive(hx, hy) and player.can_place():
-                    # Placement preview (only if player has cells remaining)
-                    preview_color = (*player.color, int(150 * hover_pulse))
-                    hover_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
-                    pygame.draw.rect(hover_surf, preview_color, hover_surf.get_rect(), border_radius=2)
-                    pygame.draw.rect(hover_surf, (*player.color, 200), hover_surf.get_rect(), 2, border_radius=2)
-                    self.screen.blit(hover_surf, hover_rect.topleft)
+                if not grid.is_alive(hx, hy):
+                    # Placement preview - show if player has cells in bank
+                    if player.can_place():
+                        # Can place - show placement preview
+                        preview_color = (*player.color, int(150 * hover_pulse))
+                        hover_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
+                        pygame.draw.rect(hover_surf, preview_color, hover_surf.get_rect(), border_radius=2)
+                        pygame.draw.rect(hover_surf, (*player.color, 200), hover_surf.get_rect(), 2, border_radius=2)
+                        self.screen.blit(hover_surf, hover_rect.topleft)
+                    else:
+                        # No cells remaining in bank - show blocked indicator
+                        blocked_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
+                        pygame.draw.rect(blocked_surf, (100, 100, 100, int(80 * hover_pulse)), blocked_surf.get_rect())
+                        pygame.draw.rect(blocked_surf, (150, 150, 150, 150), blocked_surf.get_rect(), 1, border_radius=2)
+                        self.screen.blit(blocked_surf, hover_rect.topleft)
                 elif grid.is_alive(hx, hy):
-                    # Removal preview (always available for existing cells)
+                    # Removal preview (always available for existing cells in player's zone)
                     remove_surf = pygame.Surface((cell_size, cell_size), pygame.SRCALPHA)
                     pygame.draw.rect(remove_surf, (255, 50, 50, int(100 * hover_pulse)), remove_surf.get_rect())
                     pygame.draw.line(remove_surf, (255, 100, 100, 200), (2, 2), (cell_size-2, cell_size-2), 2)
@@ -355,43 +367,69 @@ class Renderer:
         
         self.screen.blit(score_surf, (self.config.SCREEN_WIDTH // 2 - score_width // 2, 10))
         
-    def draw_placement_ui(self, players: List[Player], time: int) -> None:
+    def draw_placement_ui(self, players: List[Player], time: int,
+                          time_remaining: float = 25.0,
+                          placed_counts: dict = None) -> None:
         """Draw placement phase UI elements."""
         pulse = abs(math.sin(time * 0.05)) * 0.4 + 0.6
         
-        # Title
+        # Title at top
         title = self.title_font.render("LIFEPONG", True, self.colors.NEON_GREEN)
-        shadow = self.title_font.render("LIFEPONG", True, (0, 50, 0))
-        self.screen.blit(shadow, (self.config.SCREEN_WIDTH // 2 - shadow.get_width() // 2 + 3,
-                                  self.config.SCREEN_HEIGHT // 2 - 100 + 3))
-        self.screen.blit(title, (self.config.SCREEN_WIDTH // 2 - title.get_width() // 2,
-                                 self.config.SCREEN_HEIGHT // 2 - 100))
+        title_x = self.config.SCREEN_WIDTH // 2 - title.get_width() // 2
+        self.screen.blit(title, (title_x, 100))
         
-        # Start prompt
-        start_color = tuple(int(c * pulse) for c in self.colors.WHITE)
-        start_text = self.font.render("[ Press SPACE to Start ]", True, start_color)
-        self.screen.blit(start_text, (self.config.SCREEN_WIDTH // 2 - start_text.get_width() // 2,
-                                      self.config.SCREEN_HEIGHT // 2 + 10))
+        # Timer at center
+        self._draw_placement_timer(time_remaining, time)
         
-        # Player info boxes (semi-transparent)
+        # Player info at bottom corners - simple text, no box
         for player in players:
             is_p1 = player.id == 1
-            x = 15 if is_p1 else self.config.SCREEN_WIDTH - 195
-            box_width, box_height = 180, 80
-            box = pygame.Rect(x, self.config.SCREEN_HEIGHT // 2 - 50, box_width, box_height)
+            placed_count = placed_counts.get(player.id, 0) if placed_counts else 0
             
-            # Create semi-transparent surface
-            box_surf = pygame.Surface((box_width, box_height), pygame.SRCALPHA)
-            bg_color = (15, 25, 35, 140) if is_p1 else (25, 15, 25, 140)
-            pygame.draw.rect(box_surf, bg_color, box_surf.get_rect(), border_radius=10)
-            pygame.draw.rect(box_surf, (*player.color, 180), box_surf.get_rect(), 2, border_radius=10)
+            x = 20 if is_p1 else self.config.SCREEN_WIDTH - 120
+            y = self.config.SCREEN_HEIGHT - 50
             
-            label = self.font.render(f"PLAYER {player.id}", True, player.color)
-            cells_text = self.font.render(f"Cells: {player.cells_remaining}", True, self.colors.WHITE)
-            
-            box_surf.blit(label, (10, 5))
-            box_surf.blit(cells_text, (10, 40))
-            self.screen.blit(box_surf, box.topleft)
+            # Just simple text
+            info_text = self.small_font.render(f"P{player.id}: {placed_count}/{player.cells_remaining + placed_count}", True, player.color)
+            self.screen.blit(info_text, (x, y))
+        
+        # Start prompt at center
+        if time_remaining > 0:
+            start_color = tuple(int(c * pulse) for c in self.colors.WHITE)
+            start_text = self.font.render("[ Press SPACE to Start ]", True, start_color)
+        else:
+            start_text = self.font.render("Starting...", True, self.colors.NEON_YELLOW)
+        
+        self.screen.blit(start_text, (self.config.SCREEN_WIDTH // 2 - start_text.get_width() // 2,
+                                      self.config.SCREEN_HEIGHT // 2 + 30))
+    
+    def _draw_placement_timer(self, time_remaining: float, time: int) -> None:
+        """Draw the placement countdown timer."""
+        # Color based on time
+        if time_remaining > 15:
+            timer_color = self.colors.NEON_GREEN
+            phase_text = "RAPID"
+        elif time_remaining > 5:
+            timer_color = self.colors.NEON_YELLOW
+            phase_text = "PRECISION"
+        else:
+            pulse = abs(math.sin(time * 0.3)) * 0.5 + 0.5
+            timer_color = tuple(int(c * pulse) for c in self.colors.NEON_ORANGE)
+            phase_text = "FINAL"
+        
+        # Just draw the time big in center
+        seconds = int(time_remaining)
+        tenths = int((time_remaining - seconds) * 10)
+        time_text = self.timer_font.render(f"{seconds}.{tenths}", True, timer_color)
+        
+        time_x = self.config.SCREEN_WIDTH // 2 - time_text.get_width() // 2
+        time_y = self.config.SCREEN_HEIGHT // 2 - 80
+        
+        self.screen.blit(time_text, (time_x, time_y))
+        
+        # Phase label below
+        phase_label = self.small_font.render(phase_text, True, timer_color)
+        self.screen.blit(phase_label, (self.config.SCREEN_WIDTH // 2 - phase_label.get_width() // 2, time_y + 70))
             
     def draw_speed_indicator(self, ball: Ball) -> None:
         """Draw ball speed indicator bar."""
